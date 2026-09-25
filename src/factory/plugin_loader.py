@@ -12,6 +12,7 @@ from types import ModuleType
 
 from factory.plugin import InvalidPluginError, Plugin, PluginError
 from factory.plugin_config import PluginConfig
+from factory.work import WorkUnit
 
 
 class PluginLoadError(Exception):
@@ -134,3 +135,29 @@ def load_enabled_plugins(
     """
     search_paths = (builtin_dir, *config.paths)
     return tuple(resolve_plugin(name, search_paths) for name in config.enabled)
+
+
+def collect_startup_units(
+    config: PluginConfig,
+    *,
+    core_dir: Path = Path("plugins/core"),
+    builtin_dir: Path = Path("plugins/builtin"),
+    extra_units: tuple[WorkUnit, ...] = (),
+) -> tuple[WorkUnit, ...]:
+    """Assemble the work units Factory runs with at startup.
+
+    Core plugin units first, then the configured optional plugin units
+    (in ``enabled`` order), then any extra units such as the existing
+    Python entry-point work units. A missing ``factory.toml`` yields
+    empty optional configuration via ``PluginConfig.load()``.
+    """
+    # Local import: factory.core_plugins imports this module.
+    from factory.core_plugins import load_core_plugins
+
+    plugins = (
+        *load_core_plugins(core_dir),
+        *load_enabled_plugins(config, builtin_dir=builtin_dir),
+    )
+    return tuple(unit for plugin in plugins for unit in plugin.units) + tuple(
+        extra_units
+    )
