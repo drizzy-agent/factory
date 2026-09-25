@@ -7,7 +7,7 @@ import dataclasses
 import pytest
 
 from factory.jsonrpc import JsonObject
-from factory.plugin import Plugin
+from factory.plugin import InvalidPluginError, Plugin
 from factory.work import WorkContext, WorkResult, WorkUnit
 
 
@@ -33,7 +33,7 @@ def test_plugin_accepts_empty_units() -> None:
 
 
 def test_plugin_rejects_empty_name() -> None:
-    with pytest.raises(ValueError, match="non-empty"):
+    with pytest.raises(InvalidPluginError, match="non-empty"):
         Plugin(name="", units=(_ExampleUnit(),))
 
 

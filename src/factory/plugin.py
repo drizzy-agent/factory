@@ -7,6 +7,14 @@ from dataclasses import dataclass
 from factory.work import WorkUnit
 
 
+class PluginError(Exception):
+    """Base class for plugin descriptor errors."""
+
+
+class InvalidPluginError(PluginError):
+    """Raised when a plugin descriptor is invalid."""
+
+
 @dataclass(frozen=True, slots=True)
 class Plugin:
     """A named, immutable bundle of work units shipped as a plugin.
@@ -21,4 +29,4 @@ class Plugin:
 
     def __post_init__(self) -> None:
         if not self.name:
-            raise ValueError("Plugin name must be non-empty")
+            raise InvalidPluginError("Plugin name must be non-empty")
