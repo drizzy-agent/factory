@@ -126,7 +126,6 @@ def test_plugin_load_errors_share_one_base() -> None:
         assert issubclass(error, Exception)
 
 
-
 def _write_named_plugin(
     directory: Path, name: str, declared_name: str | None = None
 ) -> None:
