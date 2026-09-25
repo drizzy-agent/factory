@@ -15,7 +15,8 @@ from factory.core_plugins import (
 )
 from factory.jsonrpc import JsonObject
 from factory.notifications import NotificationLog
-from factory.plugin import Plugin, PluginError
+from factory.plugin import Plugin
+from factory.plugin_loader import PluginLoadError
 from factory.tmux import TmuxRuntime
 from factory.work import (
     DuplicateWorkUnitError,
@@ -88,7 +89,7 @@ def test_duplicate_plugin_names_are_rejected(tmp_path: Path) -> None:
 
 def test_loader_errors_are_not_silenced(tmp_path: Path) -> None:
     (tmp_path / "invalid.py").write_text("PLUGIN = object()\n")
-    with pytest.raises(PluginError):
+    with pytest.raises(PluginLoadError):
         load_core_plugins(tmp_path)
 
 
